@@ -40,6 +40,215 @@ graph TB
     end
 ```
 
+## Code Flow Diagrams
+
+### 1. Feedback Submission Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant FeedbackForm
+    participant FeedbackContext
+    participant API
+    participant FastAPI
+    participant Database
+    participant InsightEngine
+    
+    User->>FeedbackForm: Enter feedback message
+    User->>FeedbackForm: Click Submit
+    FeedbackForm->>FeedbackContext: submitFeedback(message)
+    FeedbackContext->>API: POST /api/feedback
+    API->>FastAPI: HTTP Request
+    FastAPI->>FastAPI: Validate input
+    FastAPI->>Database: INSERT feedback
+    Database-->>FastAPI: feedback_id
+    FastAPI->>InsightEngine: Trigger async processing
+    FastAPI-->>API: 201 Created + feedback data
+    API-->>FeedbackContext: Success response
+    FeedbackContext->>FeedbackContext: Update feedback state
+    FeedbackContext-->>FeedbackForm: Success
+    FeedbackForm->>FeedbackForm: Clear input field
+    FeedbackForm->>User: Show success message
+    
+    Note over InsightEngine,Database: Async Processing
+    InsightEngine->>InsightEngine: Analyze sentiment (TextBlob)
+    InsightEngine->>InsightEngine: Extract themes (NLTK)
+    InsightEngine->>InsightEngine: Generate recommendations
+    InsightEngine->>Database: INSERT insight
+```
+
+### 2. Feedback Display Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant FeedbackList
+    participant FeedbackContext
+    participant API
+    participant FastAPI
+    participant Database
+    
+    User->>FeedbackList: View page
+    FeedbackList->>FeedbackContext: Access feedback state
+    FeedbackContext->>API: GET /api/feedback
+    API->>FastAPI: HTTP Request
+    FastAPI->>Database: SELECT feedback LEFT JOIN insights
+    Database-->>FastAPI: feedback + insights data
+    FastAPI->>FastAPI: Transform to FeedbackWithInsights
+    FastAPI->>FastAPI: Parse JSON themes/recommendations
+    FastAPI-->>API: 200 OK + data array
+    API-->>FeedbackContext: Feedback with insights
+    FeedbackContext->>FeedbackContext: Update state
+    FeedbackContext-->>FeedbackList: Render data
+    FeedbackList->>User: Display table with insights
+    
+    User->>FeedbackList: Sort by sentiment score
+    FeedbackList->>FeedbackList: Re-sort data locally
+    FeedbackList->>User: Update table display
+    
+    User->>FeedbackList: Search themes
+    FeedbackList->>FeedbackList: Filter data locally
+    FeedbackList->>User: Show filtered results
+```
+
+### 3. Insights Display Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant InsightsPanel
+    participant WordCloud
+    participant FeedbackContext
+    participant API
+    participant FastAPI
+    participant Database
+    
+    User->>InsightsPanel: View insights section
+    InsightsPanel->>FeedbackContext: Access insights state
+    FeedbackContext->>API: GET /api/insights
+    API->>FastAPI: HTTP Request
+    FastAPI->>Database: SELECT insights JOIN feedback
+    Database-->>FastAPI: insights + feedback data
+    FastAPI->>FastAPI: Aggregate analytics
+    FastAPI->>FastAPI: Count theme frequencies
+    FastAPI->>FastAPI: Sort top positive/negative
+    FastAPI-->>API: 200 OK + analytics
+    API-->>FeedbackContext: Insights data
+    FeedbackContext->>FeedbackContext: Update state
+    FeedbackContext-->>InsightsPanel: Render insights
+    
+    InsightsPanel->>InsightsPanel: Display themes table
+    InsightsPanel->>WordCloud: Pass themes data
+    WordCloud->>WordCloud: Transform to tag format
+    WordCloud->>WordCloud: Render word cloud
+    WordCloud->>User: Display visualization
+```
+
+### 4. Insight Processing Pipeline Flow
+
+```mermaid
+flowchart TD
+    A[Feedback Submitted] --> B[Trigger Async Processing]
+    B --> C[Create New DB Session]
+    C --> D[Analyze Feedback Text]
+    
+    D --> E[Sentiment Analysis]
+    E --> E1[TextBlob Processing]
+    E1 --> E2[Calculate Polarity Score]
+    E2 --> E3[Determine Label]
+    
+    D --> F[Theme Extraction]
+    F --> F1[NLTK Tokenization]
+    F1 --> F2[Remove Stopwords]
+    F2 --> F3[POS Tagging]
+    F3 --> F4[Extract Nouns/Adjectives]
+    
+    D --> G[Generate Recommendations]
+    G --> G1[Analyze Sentiment Context]
+    G1 --> G2[Identify Action Items]
+    
+    E3 --> H[Combine Results]
+    F4 --> H
+    G2 --> H
+    
+    H --> I[Create Insight Record]
+    I --> J[Store in Database]
+    J --> K{Success?}
+    
+    K -->|Yes| L[Log Success]
+    K -->|No| M[Log Error & Rollback]
+    
+    L --> N[Close DB Session]
+    M --> N
+    N --> O[End]
+```
+
+### 5. Component State Management Flow
+
+```mermaid
+flowchart LR
+    A[App Component] --> B[FeedbackProvider]
+    B --> C[FeedbackContext State]
+    
+    C --> D[feedback array]
+    C --> E[insights object]
+    C --> F[loading states]
+    C --> G[error states]
+    
+    D --> H[FeedbackForm]
+    D --> I[FeedbackList]
+    
+    E --> J[InsightsPanel]
+    J --> K[Themes Table]
+    J --> L[WordCloud]
+    
+    F --> H
+    F --> I
+    F --> J
+    
+    G --> H
+    G --> I
+    G --> J
+    
+    H -->|submitFeedback| M[API Call]
+    I -->|fetchFeedback| M
+    J -->|fetchInsights| M
+    
+    M --> N[Update Context State]
+    N --> C
+```
+
+### 6. Data Transformation Flow
+
+```mermaid
+flowchart TD
+    A[Raw Feedback Text] --> B[Database Storage]
+    B --> C[Feedback Record]
+    
+    C --> D[Insight Processing]
+    D --> E[Sentiment Score: float]
+    D --> F[Themes: JSON string]
+    D --> G[Recommendations: JSON string]
+    
+    E --> H[Insight Record in DB]
+    F --> H
+    G --> H
+    
+    H --> I[API Response]
+    I --> J[Parse JSON Fields]
+    J --> K[FeedbackWithInsights Model]
+    
+    K --> L[Frontend State]
+    L --> M[FeedbackList Display]
+    L --> N[InsightsPanel Display]
+    
+    N --> O[Themes Array]
+    O --> P[Theme Table Rendering]
+    O --> Q[WordCloud Transformation]
+    Q --> R[Tag Cloud Format]
+    R --> S[Visual Display]
+```
+
 ## Components and Interfaces
 
 ### Frontend Components

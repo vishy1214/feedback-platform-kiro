@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from database import create_tables, get_db, Feedback, Insight
-from models import FeedbackCreate, FeedbackResponse, InsightsAnalytics, TopSentimentFeedback, ThemeCount, Recommendation
+from models import FeedbackCreate, FeedbackResponse, FeedbackWithInsights, InsightsAnalytics, TopSentimentFeedback, ThemeCount, Recommendation
 from feedback_pipeline import process_feedback_async
 from typing import List
 import asyncio
@@ -102,14 +102,54 @@ def trigger_insight_processing(feedback_id: int, message: str):
     finally:
         db.close()
 
-@app.get("/api/feedback", response_model=List[FeedbackResponse])
+@app.get("/api/feedback", response_model=List[FeedbackWithInsights])
 def get_all_feedback(db: Session = Depends(get_db)):
     """
-    Retrieve all feedback messages
+    Retrieve all feedback messages with their insights
     """
     try:
-        feedback_list = db.query(Feedback).order_by(Feedback.created_at.desc()).all()
-        return feedback_list
+        # Query feedback with left join to insights
+        feedback_query = db.query(Feedback, Insight).outerjoin(
+            Insight, Feedback.id == Insight.feedback_id
+        ).order_by(Feedback.created_at.desc()).all()
+        
+        # Transform to FeedbackWithInsights model
+        result = []
+        for feedback, insight in feedback_query:
+            feedback_data = {
+                "id": feedback.id,
+                "message": feedback.message,
+                "timestamp": feedback.timestamp,
+                "created_at": feedback.created_at,
+                "sentiment_score": None,
+                "sentiment_label": None,
+                "themes": None,
+                "recommendations": None,
+                "insight_processed_at": None
+            }
+            
+            # Add insight data if available
+            if insight:
+                feedback_data["sentiment_score"] = insight.sentiment_score
+                feedback_data["sentiment_label"] = insight.sentiment_label
+                feedback_data["insight_processed_at"] = insight.processed_at
+                
+                # Parse JSON fields
+                if insight.themes:
+                    try:
+                        feedback_data["themes"] = json.loads(insight.themes)
+                    except json.JSONDecodeError:
+                        feedback_data["themes"] = []
+                
+                if insight.recommendations:
+                    try:
+                        feedback_data["recommendations"] = json.loads(insight.recommendations)
+                    except json.JSONDecodeError:
+                        feedback_data["recommendations"] = []
+            
+            result.append(FeedbackWithInsights(**feedback_data))
+        
+        return result
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve feedback: {str(e)}")

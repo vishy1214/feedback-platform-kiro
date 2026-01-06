@@ -108,3 +108,69 @@ A simple Feedback Insights Platform POC that allows users to submit feedback mes
 3. THE Feedback_System SHALL provide GET /api/insights endpoint for retrieving insight analytics
 4. WHEN API calls fail, THE Feedback_System SHALL return appropriate HTTP status codes and error messages
 5. THE Feedback_System SHALL use JSON format for all API request and response payloads
+
+
+## Updated Requirements (Enhancement Phase)
+
+### Requirement 9: Enhanced Feedback API with Insights
+
+**User Story:** As a frontend developer, I want feedback data to include associated insights, so that I can display comprehensive information in a single view.
+
+#### Acceptance Criteria
+
+1. THE Feedback_System SHALL modify GET /api/feedback endpoint to include associated insight data
+2. WHEN feedback is retrieved, THE Feedback_System SHALL join insight information based on feedback-insight relationship
+3. THE Feedback_System SHALL include sentiment score, themes, and recommendations with each feedback item
+4. THE Feedback_System SHALL handle cases where insights are not yet available for feedback
+
+### Requirement 10: Enhanced Feedback Table Display
+
+**User Story:** As a user, I want to view feedback with insights in a comprehensive table format, so that I can analyze all information at once.
+
+#### Acceptance Criteria
+
+1. THE Feedback_System SHALL display feedback in a full-width table format
+2. THE Feedback_System SHALL show feedback message, sentiment score, themes, recommendations, and creation date for each item
+3. THE Feedback_System SHALL enable sorting by sentiment score in ascending or descending order
+4. THE Feedback_System SHALL default to ascending order for sentiment score sorting
+5. THE Feedback_System SHALL provide search functionality for the themes column
+6. THE Feedback_System SHALL enable scrolling with a default view of 10 feedback items
+7. THE Feedback_System SHALL display feedback creation date in the table
+
+### Requirement 11: Simplified Insights Panel
+
+**User Story:** As a user, I want a focused insights panel showing only key themes, so that I can quickly understand the main topics.
+
+#### Acceptance Criteria
+
+1. THE Feedback_System SHALL display the insights panel below the feedback table
+2. THE Feedback_System SHALL show only the key themes section in the insights panel
+3. THE Feedback_System SHALL remove top positive/negative sentiment displays from insights panel
+4. THE Feedback_System SHALL remove recommendations display from insights panel
+5. THE Feedback_System SHALL maintain theme frequency counts in the insights panel
+
+### Requirement 12: Responsive Layout Updates
+
+**User Story:** As a user, I want the feedback table to use the full screen width, so that I can see more information at once.
+
+#### Acceptance Criteria
+
+1. THE Feedback_System SHALL render the feedback table at full screen width
+2. THE Feedback_System SHALL position the insights panel below the feedback table
+3. THE Feedback_System SHALL maintain responsive design for different screen sizes
+4. THE Feedback_System SHALL ensure proper scrolling for both table and insights panel
+
+### Requirement 13: Word Cloud Visualization
+
+**User Story:** As a user, I want to see a visual word cloud of key themes, so that I can quickly understand the most prominent topics at a glance.
+
+#### Acceptance Criteria
+
+1. THE Feedback_System SHALL divide the insights section into two equal parts
+2. THE Feedback_System SHALL display the key themes table in the left section
+3. THE Feedback_System SHALL display a word cloud visualization in the right section
+4. THE Feedback_System SHALL generate the word cloud based on theme names and their frequency counts
+5. WHEN themes are updated, THE Feedback_System SHALL refresh the word cloud visualization
+6. THE Feedback_System SHALL scale word sizes proportionally to theme frequency counts
+7. THE Feedback_System SHALL use appropriate colors and styling for the word cloud
+8. THE Feedback_System SHALL handle cases where no themes are available gracefully

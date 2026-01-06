@@ -5,6 +5,7 @@
 - **Build Tool:** Vite 5.0
 - **Package Manager:** npm
 - **Port:** 5173 (development)
+- **Visualization:** react-tagcloud for word cloud visualization
 
 ## Backend
 - **Framework:** FastAPI
@@ -61,7 +62,7 @@ docker-compose build client
 ```
 
 ## Key Dependencies
-- **Frontend:** react, react-dom, vite
+- **Frontend:** react, react-dom, vite, react-tagcloud
 - **Backend:** fastapi, uvicorn, sqlalchemy, sqlite3
 - **AI/NLP:** textblob, nltk
 - **Async Processing:** asyncio (built-in Python)

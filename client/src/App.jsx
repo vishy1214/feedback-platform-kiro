@@ -48,16 +48,14 @@ export default function App() {
               <FeedbackForm />
             </section>
             
-            {/* Feedback and Insights Grid */}
-            <section>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', 
-                gap: '20px'
-              }}>
-                <FeedbackList />
-                <InsightsPanel />
-              </div>
+            {/* Feedback Table - Full Width */}
+            <section style={{ marginBottom: '30px' }}>
+              <FeedbackList />
+            </section>
+            
+            {/* Insights Panel - Full Width Below */}
+            <section style={{ marginBottom: '30px' }}>
+              <InsightsPanel />
             </section>
           </main>
           
@@ -88,13 +86,6 @@ export default function App() {
           padding: 0;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 1100px) {
-          section > div {
-            grid-template-columns: 1fr !important;
-          }
         }
         
         /* Scrollbar styling */

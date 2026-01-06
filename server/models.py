@@ -28,6 +28,21 @@ class InsightResponse(BaseModel):
     class Config:
         from_attributes = True
 
+# Combined Feedback with Insights Response
+class FeedbackWithInsights(BaseModel):
+    id: int
+    message: str
+    timestamp: datetime
+    created_at: datetime
+    sentiment_score: Optional[float] = None
+    sentiment_label: Optional[str] = None
+    themes: Optional[List[str]] = None
+    recommendations: Optional[List[str]] = None
+    insight_processed_at: Optional[datetime] = None
+    
+    class Config:
+        from_attributes = True
+
 # Analytics Response Models
 class TopSentimentFeedback(BaseModel):
     feedback: str
