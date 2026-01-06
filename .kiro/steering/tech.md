@@ -8,9 +8,23 @@
 
 ## Backend
 - **Framework:** FastAPI
-- **Runtime:** Python with uvicorn server
+- **Runtime:** Python 3 with uvicorn server
 - **Port:** 8000
+- **Database:** SQLite (in-memory for POC)
+- **ORM:** SQLAlchemy for database operations
 - **AI Pipeline:** Custom feedback analysis module
+
+## Database
+- **Type:** SQLite in-memory database
+- **ORM:** SQLAlchemy with FastAPI integration
+- **Tables:** feedback, insights
+- **Migration:** Automatic table creation on startup
+
+## Insight Generation
+- **Framework:** TextBlob for sentiment analysis
+- **NLP Library:** NLTK for text processing and theme extraction
+- **Processing:** Asyncio for background insight generation
+- **Storage:** Results stored in insights table linked to feedback
 
 ## Development Environment
 - **Containerization:** Docker with Docker Compose
@@ -48,4 +62,6 @@ docker-compose build client
 
 ## Key Dependencies
 - **Frontend:** react, react-dom, vite
-- **Backend:** fastapi, uvicorn
+- **Backend:** fastapi, uvicorn, sqlalchemy, sqlite3
+- **AI/NLP:** textblob, nltk
+- **Async Processing:** asyncio (built-in Python)
