@@ -174,3 +174,35 @@ A simple Feedback Insights Platform POC that allows users to submit feedback mes
 6. THE Feedback_System SHALL scale word sizes proportionally to theme frequency counts
 7. THE Feedback_System SHALL use appropriate colors and styling for the word cloud
 8. THE Feedback_System SHALL handle cases where no themes are available gracefully
+
+### Requirement 14: Unit Testing Coverage
+
+**User Story:** As a developer, I want comprehensive unit tests for all components, so that I can ensure code quality and catch bugs early.
+
+#### Acceptance Criteria
+
+1. THE Feedback_System SHALL provide unit tests for all backend API endpoints
+2. THE Feedback_System SHALL provide unit tests for the insight processing pipeline
+3. THE Feedback_System SHALL provide unit tests for database models and operations
+4. THE Feedback_System SHALL provide unit tests for all React components
+5. THE Feedback_System SHALL provide unit tests for the FeedbackContext state management
+6. THE Feedback_System SHALL provide unit tests for API utility functions
+7. THE Feedback_System SHALL achieve minimum 80% code coverage for backend services
+8. THE Feedback_System SHALL achieve minimum 70% code coverage for frontend components
+9. WHEN unit tests are executed, THE Feedback_System SHALL report test results and coverage metrics
+
+### Requirement 15: End-to-End Testing
+
+**User Story:** As a developer, I want end-to-end tests for critical user flows, so that I can ensure the entire system works correctly from user perspective.
+
+#### Acceptance Criteria
+
+1. THE Feedback_System SHALL provide E2E test for complete feedback submission flow
+2. THE Feedback_System SHALL provide E2E test for feedback display and retrieval flow
+3. THE Feedback_System SHALL provide E2E test for insight generation and display flow
+4. THE Feedback_System SHALL provide E2E test for feedback table sorting functionality
+5. THE Feedback_System SHALL provide E2E test for theme search functionality
+6. THE Feedback_System SHALL provide E2E test for word cloud visualization rendering
+7. THE Feedback_System SHALL provide E2E test for error handling scenarios
+8. WHEN E2E tests are executed, THE Feedback_System SHALL run tests against a test database
+9. THE Feedback_System SHALL clean up test data after E2E test execution

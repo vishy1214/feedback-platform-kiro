@@ -3,3 +3,7 @@ uvicorn
 sqlalchemy
 textblob
 nltk
+pytest
+pytest-asyncio
+pytest-cov
+httpx
