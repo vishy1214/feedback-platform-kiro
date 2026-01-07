@@ -87,7 +87,9 @@ def trigger_insight_processing(feedback_id: int, message: str):
             sentiment_score=analysis["sentiment_score"],
             sentiment_label=analysis["sentiment_label"],
             themes=json.dumps(analysis["themes"]),
-            recommendations=json.dumps(analysis["recommendations"])
+            recommendations=json.dumps(analysis["recommendations"]),
+            priority_score=analysis["priority_score"],
+            priority_level=analysis["priority_level"]
         )
         
         # Save to database
@@ -125,6 +127,8 @@ def get_all_feedback(db: Session = Depends(get_db)):
                 "sentiment_label": None,
                 "themes": None,
                 "recommendations": None,
+                "priority_score": None,
+                "priority_level": None,
                 "insight_processed_at": None
             }
             
@@ -132,6 +136,8 @@ def get_all_feedback(db: Session = Depends(get_db)):
             if insight:
                 feedback_data["sentiment_score"] = insight.sentiment_score
                 feedback_data["sentiment_label"] = insight.sentiment_label
+                feedback_data["priority_score"] = insight.priority_score
+                feedback_data["priority_level"] = insight.priority_level
                 feedback_data["insight_processed_at"] = insight.processed_at
                 
                 # Parse JSON fields

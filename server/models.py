@@ -38,6 +38,8 @@ class FeedbackWithInsights(BaseModel):
     sentiment_label: Optional[str] = None
     themes: Optional[List[str]] = None
     recommendations: Optional[List[str]] = None
+    priority_score: Optional[int] = None
+    priority_level: Optional[str] = None
     insight_processed_at: Optional[datetime] = None
     
     class Config:

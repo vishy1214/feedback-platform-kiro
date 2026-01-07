@@ -2,6 +2,7 @@
 
 A minimal feedback collection and analysis platform that combines React frontend with FastAPI backend to process user feedback using AI.
 
+
 ## Features
 
 - 📝 Feedback submission form
@@ -12,6 +13,32 @@ A minimal feedback collection and analysis platform that combines React frontend
 - 🔍 Sortable and searchable feedback table
 - ☁️ Word cloud visualization
 - ✅ Comprehensive backend testing (29 tests)
+
+## Project Documentation
+
+- **Requirements**: `.kiro/specs/feedback-insights-platform/requirements.md`
+- **Design**: `.kiro/specs/feedback-insights-platform/design.md`
+- **Tasks**: `.kiro/specs/feedback-insights-platform/tasks*.md`
+- **Steering**: `.kiro/steering/*.md`
+
+## Key Features Explained
+
+### Feedback Table
+- Displays all feedback with sentiment scores, themes, and recommendations
+- Sortable by sentiment score (ascending/descending)
+- Searchable by themes
+- Shows 10 items by default with scrolling
+
+### Insights Panel
+- **Themes Table**: Lists all identified themes with frequency counts
+- **Word Cloud**: Visual representation of themes sized by frequency
+
+### AI Processing
+- Automatic sentiment analysis on feedback submission
+- Asynchronous processing to avoid blocking
+- Theme extraction using NLP
+- Recommendation generation based on sentiment and themes
+
 
 ## Structure
 - `client/` - React 18 + Vite frontend
@@ -70,21 +97,7 @@ docker-compose up --build
 - **GET** `/health`
 - Response: Service health status
 
-## Testing
 
-### Run Backend Tests
-```bash
-docker run --rm feedback-platform-kiro-server pytest tests/ -v
-```
-
-### Run Tests with Coverage
-```bash
-docker run --rm feedback-platform-kiro-server pytest tests/ --cov=. --cov-report=html
-```
-
-### Test Results
-- ✅ 29 backend unit tests passing
-- Coverage: API endpoints, insight processing, database models
 
 ## Technology Stack
 
@@ -125,30 +138,24 @@ uvicorn app:app --reload --host 0.0.0.0 --port 8000
 ```
 Access at: http://localhost:8000
 
-## Project Documentation
 
-- **Requirements**: `.kiro/specs/feedback-insights-platform/requirements.md`
-- **Design**: `.kiro/specs/feedback-insights-platform/design.md`
-- **Tasks**: `.kiro/specs/feedback-insights-platform/tasks*.md`
-- **Steering**: `.kiro/steering/*.md`
+## Testing
 
-## Key Features Explained
+### Run Backend Tests
+```bash
+docker run --rm feedback-platform-kiro-server pytest tests/ -v
+```
 
-### Feedback Table
-- Displays all feedback with sentiment scores, themes, and recommendations
-- Sortable by sentiment score (ascending/descending)
-- Searchable by themes
-- Shows 10 items by default with scrolling
+### Run Tests with Coverage
+```bash
+docker run --rm feedback-platform-kiro-server pytest tests/ --cov=. --cov-report=html
+```
 
-### Insights Panel
-- **Themes Table**: Lists all identified themes with frequency counts
-- **Word Cloud**: Visual representation of themes sized by frequency
+### Test Results
+- ✅ 29 backend unit tests passing
+- Coverage: API endpoints, insight processing, database models
 
-### AI Processing
-- Automatic sentiment analysis on feedback submission
-- Asynchronous processing to avoid blocking
-- Theme extraction using NLP
-- Recommendation generation based on sentiment and themes
+
 
 ## License
 

@@ -35,6 +35,8 @@ class Insight(Base):
     sentiment_label = Column(String(20), nullable=True)  # positive/negative/neutral
     themes = Column(Text, nullable=True)  # JSON array of extracted themes
     recommendations = Column(Text, nullable=True)  # JSON array of suggestions
+    priority_score = Column(Integer, nullable=True)  # Priority score based on rules
+    priority_level = Column(String(10), nullable=True)  # HIGH/MEDIUM/LOW
     processed_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationship to feedback

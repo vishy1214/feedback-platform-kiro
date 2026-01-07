@@ -206,3 +206,30 @@ A simple Feedback Insights Platform POC that allows users to submit feedback mes
 7. THE Feedback_System SHALL provide E2E test for error handling scenarios
 8. WHEN E2E tests are executed, THE Feedback_System SHALL run tests against a test database
 9. THE Feedback_System SHALL clean up test data after E2E test execution
+
+### Requirement 16: Priority Scoring and Classification
+
+**User Story:** As a product manager, I want feedback to be automatically prioritized based on sentiment and content signals, so that I can focus on the most critical issues first.
+
+#### Acceptance Criteria
+
+1. THE Insight_Engine SHALL calculate a priority score for each feedback based on multiple rules
+2. WHEN sentiment score is less than or equal to -0.6, THE Insight_Engine SHALL add 40 points to priority score
+3. WHEN sentiment score is less than or equal to -0.3, THE Insight_Engine SHALL add 25 points to priority score
+4. WHEN sentiment score is less than 0, THE Insight_Engine SHALL add 15 points to priority score
+5. WHEN sentiment score is greater than or equal to 0, THE Insight_Engine SHALL add 0 points to priority score
+6. WHEN feedback contains revenue/critical flow keywords, THE Insight_Engine SHALL add 25 points to priority score
+7. THE Insight_Engine SHALL recognize revenue keywords: "payment", "checkout", "purchase", "billing", "invoice", "transaction"
+8. WHEN feedback contains blocker/failure keywords, THE Insight_Engine SHALL add 20 points to priority score
+9. THE Insight_Engine SHALL recognize blocker keywords: "can't", "cannot", "unable", "fails", "failed", "broken", "error", "not working"
+10. WHEN feedback contains usability/friction keywords, THE Insight_Engine SHALL add 10 points to priority score
+11. THE Insight_Engine SHALL recognize usability keywords: "hard", "confusing", "too many", "difficult", "pain", "painful", "slow"
+12. WHEN feedback contains first-time user keywords, THE Insight_Engine SHALL add 5 points to priority score
+13. THE Insight_Engine SHALL recognize first-time user keywords: "first time", "new user", "getting started", "onboarding"
+14. THE Insight_Engine SHALL classify priority as HIGH when score is greater than or equal to 60
+15. THE Insight_Engine SHALL classify priority as MEDIUM when score is greater than or equal to 30 and less than 60
+16. THE Insight_Engine SHALL classify priority as LOW when score is less than 30
+17. THE Feedback_System SHALL store priority score and priority level with each insight
+18. THE Feedback_System SHALL display priority score and priority level in the feedback table
+19. THE Feedback_System SHALL add priority score column to feedback table
+20. THE Feedback_System SHALL add priority level column to feedback table

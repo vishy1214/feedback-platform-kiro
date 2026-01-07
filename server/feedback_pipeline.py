@@ -83,28 +83,97 @@ def generate_recommendations(message: str, sentiment_score: float, themes: List[
     
     return recommendations[:3]  # Return top 3 recommendations
 
+def calculate_priority_score(message: str, sentiment_score: float) -> int:
+    """
+    Calculate priority score based on sentiment and content signals
+    
+    Rules:
+    1. Sentiment-based scoring (0-40 points)
+    2. Revenue/Critical Flow Impact (+25 points)
+    3. Blocker/Failure Signals (+20 points)
+    4. Usability/Friction Signals (+10 points)
+    5. First-Time User Risk (+5 points)
+    """
+    priority_score = 0
+    message_lower = message.lower()
+    
+    # Rule 1: Sentiment-based scoring
+    if sentiment_score <= -0.6:
+        priority_score += 40
+    elif sentiment_score <= -0.3:
+        priority_score += 25
+    elif sentiment_score < 0:
+        priority_score += 15
+    else:
+        priority_score += 0
+    
+    # Rule 2: Revenue/Critical Flow Impact
+    revenue_keywords = ["payment", "checkout", "purchase", "billing", "invoice", "transaction"]
+    if any(keyword in message_lower for keyword in revenue_keywords):
+        priority_score += 25
+    
+    # Rule 3: Blocker/Failure Signals
+    blocker_keywords = ["can't", "cannot", "unable", "fails", "failed", "broken", "error", "not working"]
+    if any(keyword in message_lower for keyword in blocker_keywords):
+        priority_score += 20
+    
+    # Rule 4: Usability/Friction Signals
+    usability_keywords = ["hard", "confusing", "too many", "difficult", "pain", "painful", "slow",
+                         "bad","user experience", "terrible", "sucks", "not good"]
+    if any(keyword in message_lower for keyword in usability_keywords):
+        priority_score += 10
+    
+    # Rule 5: First-Time User Risk
+    first_time_keywords = ["first time", "new user", "getting started"]
+    if any(keyword in message_lower for keyword in first_time_keywords):
+        priority_score += 5
+    
+    return priority_score
+
+def classify_priority_level(priority_score: int) -> str:
+    """
+    Classify priority level based on score
+    
+    score >= 60: HIGH
+    score >= 30: MEDIUM
+    score < 30:  LOW
+    """
+    if priority_score >= 60:
+        return "HIGH"
+    elif priority_score >= 30:
+        return "MEDIUM"
+    else:
+        return "LOW"
+
 def analyze_feedback(message: str) -> Dict:
     """
     Complete feedback analysis pipeline
     Input: feedback message
-    Output: dict with sentiment, topics, recommendations, etc.
+    Output: dict with sentiment, topics, recommendations, priority, etc.
     """
     print("starting analyze_feedback")
     try:
         # Analyze sentiment
         sentiment_score, sentiment_label = analyze_sentiment(message)
         print(f"sentiment_score: {str(sentiment_score)}")
+        
         # Extract themes
         themes = extract_themes(message)
         
         # Generate recommendations
         recommendations = generate_recommendations(message, sentiment_score, themes)
         
+        # Calculate priority
+        priority_score = calculate_priority_score(message, sentiment_score)
+        priority_level = classify_priority_level(priority_score)
+        
         return {
             "sentiment_score": sentiment_score,
             "sentiment_label": sentiment_label,
             "themes": themes,
             "recommendations": recommendations,
+            "priority_score": priority_score,
+            "priority_level": priority_level,
             "processed_at": datetime.utcnow().isoformat()
         }
     
@@ -115,6 +184,8 @@ def analyze_feedback(message: str) -> Dict:
             "sentiment_label": "neutral",
             "themes": [],
             "recommendations": ["Error processing feedback - manual review required"],
+            "priority_score": 0,
+            "priority_level": "LOW",
             "processed_at": datetime.utcnow().isoformat()
         }
 
@@ -134,7 +205,9 @@ async def process_feedback_async(feedback_id: int, message: str, db_session):
             sentiment_score=analysis["sentiment_score"],
             sentiment_label=analysis["sentiment_label"],
             themes=json.dumps(analysis["themes"]),
-            recommendations=json.dumps(analysis["recommendations"])
+            recommendations=json.dumps(analysis["recommendations"]),
+            priority_score=analysis["priority_score"],
+            priority_level=analysis["priority_level"]
         )
         
         # Save to database

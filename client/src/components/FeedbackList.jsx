@@ -5,17 +5,24 @@ export default function FeedbackList() {
   const { feedback, loading, error, fetchFeedback } = useFeedback();
   
   // State for sorting
+  const [sortField, setSortField] = useState('sentiment'); // 'sentiment', 'priority_score', 'priority_level'
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
   
   // State for theme search
   const [themeSearch, setThemeSearch] = useState('');
 
-  // Format date for display
+  // Format date for display in IST
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    // Convert to IST (UTC+5:30)
+    return date.toLocaleString('en-IN', { 
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
     });
   };
 
@@ -27,9 +34,32 @@ export default function FeedbackList() {
     return '#ffc107'; // Yellow for neutral
   };
 
-  // Toggle sort order
-  const toggleSort = () => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+  // Get priority level color and background
+  const getPriorityStyle = (level) => {
+    if (!level) return { bg: '#f8f9fa', color: '#999' };
+    
+    switch (level) {
+      case 'HIGH':
+        return { bg: '#dc3545', color: '#fff' };
+      case 'MEDIUM':
+        return { bg: '#ffc107', color: '#000' };
+      case 'LOW':
+        return { bg: '#28a745', color: '#fff' };
+      default:
+        return { bg: '#f8f9fa', color: '#999' };
+    }
+  };
+
+  // Toggle sort order or change sort field
+  const handleSort = (field) => {
+    if (sortField === field) {
+      // Toggle order if clicking same field
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Change field and default to descending for priority, ascending for sentiment
+      setSortField(field);
+      setSortOrder(field === 'sentiment' ? 'asc' : 'desc');
+    }
   };
 
   // Filter and sort feedback
@@ -47,20 +77,32 @@ export default function FeedbackList() {
       });
     }
     
-    // Sort by sentiment score
+    // Sort by selected field
     result.sort((a, b) => {
-      const scoreA = a.sentiment_score ?? -999; // Put null values at end
-      const scoreB = b.sentiment_score ?? -999;
+      let valueA, valueB;
+      
+      if (sortField === 'sentiment') {
+        valueA = a.sentiment_score ?? -999; // Put null values at end
+        valueB = b.sentiment_score ?? -999;
+      } else if (sortField === 'priority_score') {
+        valueA = a.priority_score ?? -999;
+        valueB = b.priority_score ?? -999;
+      } else if (sortField === 'priority_level') {
+        // Convert priority level to numeric for sorting
+        const priorityMap = { 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1, null: 0, undefined: 0 };
+        valueA = priorityMap[a.priority_level] ?? 0;
+        valueB = priorityMap[b.priority_level] ?? 0;
+      }
       
       if (sortOrder === 'asc') {
-        return scoreA - scoreB;
+        return valueA - valueB;
       } else {
-        return scoreB - scoreA;
+        return valueB - valueA;
       }
     });
     
     return result;
-  }, [feedback, themeSearch, sortOrder]);
+  }, [feedback, themeSearch, sortField, sortOrder]);
 
   // Limit to 10 items by default
   const displayedFeedback = processedFeedback.slice(0, 10);
@@ -207,31 +249,59 @@ export default function FeedbackList() {
                   textAlign: 'left', 
                   fontWeight: '600',
                   color: '#495057',
-                  width: '30%'
+                  width: '25%'
                 }}>
                   Message
                 </th>
                 <th 
-                  onClick={toggleSort}
+                  onClick={() => handleSort('sentiment')}
                   style={{ 
                     padding: '12px', 
                     textAlign: 'center', 
                     fontWeight: '600',
-                    color: '#495057',
-                    width: '10%',
+                    color: sortField === 'sentiment' ? '#007bff' : '#495057',
+                    width: '8%',
                     cursor: 'pointer',
                     userSelect: 'none',
                     position: 'relative'
                   }}
                 >
-                  Score {sortOrder === 'asc' ? '↑' : '↓'}
+                 Sentiment Score {sortField === 'sentiment' && (sortOrder === 'asc' ? '↑' : '↓')}
+                </th>
+                <th 
+                  onClick={() => handleSort('priority_score')}
+                  style={{ 
+                    padding: '12px', 
+                    textAlign: 'center', 
+                    fontWeight: '600',
+                    color: sortField === 'priority_score' ? '#007bff' : '#495057',
+                    width: '8%',
+                    cursor: 'pointer',
+                    userSelect: 'none'
+                  }}
+                >
+                  Priority Score {sortField === 'priority_score' && (sortOrder === 'asc' ? '↑' : '↓')}
+                </th>
+                <th 
+                  onClick={() => handleSort('priority_level')}
+                  style={{ 
+                    padding: '12px', 
+                    textAlign: 'center', 
+                    fontWeight: '600',
+                    color: sortField === 'priority_level' ? '#007bff' : '#495057',
+                    width: '8%',
+                    cursor: 'pointer',
+                    userSelect: 'none'
+                  }}
+                >
+                 Priority Level {sortField === 'priority_level' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th style={{ 
                   padding: '12px', 
                   textAlign: 'left', 
                   fontWeight: '600',
                   color: '#495057',
-                  width: '20%'
+                  width: '15%'
                 }}>
                   Themes
                 </th>
@@ -240,7 +310,7 @@ export default function FeedbackList() {
                   textAlign: 'left', 
                   fontWeight: '600',
                   color: '#495057',
-                  width: '25%'
+                  width: '21%'
                 }}>
                   Recommendations
                 </th>
@@ -256,7 +326,7 @@ export default function FeedbackList() {
               </tr>
             </thead>
             <tbody>
-              {displayedFeedback.map((item, index) => (
+              {displayedFeedback.map((item) => (
                 <tr 
                   key={item.id}
                   style={{
@@ -299,6 +369,53 @@ export default function FeedbackList() {
                       </span>
                     ) : (
                       <span style={{ color: '#999', fontSize: '11px' }}>Processing...</span>
+                    )}
+                  </td>
+                  
+                  {/* Priority Score */}
+                  <td style={{ 
+                    padding: '12px', 
+                    textAlign: 'center',
+                    verticalAlign: 'top'
+                  }}>
+                    {item.priority_score !== null && item.priority_score !== undefined ? (
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        backgroundColor: '#e7f3ff',
+                        color: '#0066cc',
+                        fontWeight: '600',
+                        fontSize: '12px'
+                      }}>
+                        {item.priority_score}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#999', fontSize: '11px' }}>-</span>
+                    )}
+                  </td>
+                  
+                  {/* Priority Level */}
+                  <td style={{ 
+                    padding: '12px', 
+                    textAlign: 'center',
+                    verticalAlign: 'top'
+                  }}>
+                    {item.priority_level ? (
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '4px 10px',
+                        borderRadius: '4px',
+                        backgroundColor: getPriorityStyle(item.priority_level).bg,
+                        color: getPriorityStyle(item.priority_level).color,
+                        fontWeight: '600',
+                        fontSize: '11px',
+                        textTransform: 'uppercase'
+                      }}>
+                        {item.priority_level}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#999', fontSize: '11px' }}>-</span>
                     )}
                   </td>
                   
